@@ -105,7 +105,8 @@
                         <td><%if (objDataTableGrant.Rows[i][5].ToString() == "no") { Response.Write("-"); } else { Response.Write(objDataTableGrant.Rows[i][5].ToString()); } %></td>
                         <td><%if (objDataTableGrant.Rows[i][6].ToString() == "no") { Response.Write("-"); } else { Response.Write(objDataTableGrant.Rows[i][6].ToString()); } %></td>
                         <td><%if (objDataTableGrant.Rows[i][7].ToString() == "no") { Response.Write("-"); } else { Response.Write(objDataTableGrant.Rows[i][7].ToString()); } %></td>
-                        <td><%Response.Write(objDataTableGrant.Rows[i][4]); %></td>
+                        <td><%if (objDataTableGrant.Rows[i][4].ToString() == "True") { Response.Write("Yes"); } else { Response.Write("No"); } %></td>
+
                     </tr>
                     <%
                       }    

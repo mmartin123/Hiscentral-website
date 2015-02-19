@@ -93,7 +93,7 @@
                                 <img src="../images/sucess.jpg" height="20" width="20" /></td>
                             <%} else { %>
                             <td class="usersTd3"><a href='javascript:void(0);' onclick='fnOpenPopup("<%Response.Write(objDataTable.Rows[i][4].ToString());%>");' title='Click to see the error'>
-                                <img src="../images/error.jpg" height="20" width="20" /></a></td>
+                                <img src="../images/sucess.jpg" height="20" width="20" /></a></td>
                             <%}
                               } else {%>
 

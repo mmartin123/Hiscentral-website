@@ -61,7 +61,7 @@
         <div></div>
 
         <asp:SqlDataSource ID="SqlDataSource1" runat="server" ConnectionString="<%$ ConnectionStrings:CentralHISConnectionString %>"
-            SelectCommand="SELECT username, ServiceWSDL, ServiceAbs, NetworkName, ContactName, ContactEmail, ContactPhone, Organization, website, IsPublic, SupportsAllMethods, Citation, MapIconPath, OrgIconPath, LastHarvested, NetworkTitle, IsApproved, ProjectStatus, NetworkVocab,NetworkID FROM HISNetworks WHERE (NetworkID = @NetworkID)"
+            SelectCommand="SELECT username, ServiceWSDL, ServiceAbs, NetworkName, ContactName, ContactEmail, ContactPhone, Organization, website, IsPublic, SupportsAllMethods, Citation, MapIconPath, OrgIconPath, DATEADD(hour, 5, LastHarvested) as LastHarvested,NetworkTitle, IsApproved, ProjectStatus, NetworkVocab,NetworkID FROM HISNetworks WHERE (NetworkID = @NetworkID)"
             InsertCommand="INSERT INTO HISNetworks(username, NetworkName, ServiceAbs, ServiceWSDL, ContactEmail, ContactName, ContactPhone, Organization, website) VALUES (,,,,,,,,) "
             UpdateCommand="UPDATE HISNetworks SET NetworkName = @NetworkName, ServiceWSDL = @ServiceWSDL, ServiceAbs = @ServiceAbs, ContactName = @ContactName, ContactEmail = @ContactEmail, ContactPhone = @ContactPhone, Organization = @Organization, website = @website, Citation = @Citation, IsPublic = @IsPublic, NetworkTitle = @NetworkTitle WHERE (NetworkID = @NetworkID)">
             <SelectParameters>
@@ -235,7 +235,8 @@
                         <asp:Label ID="Label14" runat="server" Font-Bold="True" Style="z-index: 124; left: 24px; position: absolute; top: 336px"
                             Text="LastHarvested:" Font-Size="16px"></asp:Label>
                         <asp:Label ID="lblHarvestDate" runat="server" Style="z-index: 125; left: 147px; position: absolute; top: 339px"
-                            Text='<%# Bind("LastHarvested") %>' Font-Size="12px" Width="157px"></asp:Label>
+  Text='<%# String.Format("{0} (UTC)", Eval("LastHarvested")) %>'  
+  Font-Size="12px" Width="165px"></asp:Label>
 
 
 

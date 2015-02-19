@@ -124,7 +124,7 @@
             <%--<input id="btn1" type="button" runat="server" value="Sources Report" title="Click to see source reports"/>--%>
            <asp:HyperLink ID="lnkNetworkName" runat="server"></asp:HyperLink>
                         <div>
-                <h4><%Response.Write(objDataTableSearchGrants.Rows[i][0].ToString()); %>objDataTable</h4>
+                <h4><%Response.Write(objDataTableSearchGrants.Rows[i][0].ToString()); %></h4>
             </div>
             <table>
                 <thead>

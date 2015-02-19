@@ -59,7 +59,7 @@ public partial class Report : System.Web.UI.Page {
         var networkName = Server.UrlDecode(Request.QueryString["n"]);
         //Testing - remove the line below when project goes live!!!!
         //NetworkName = networkName = "LittleBearRiver";
-
+        _db.Database.CommandTimeout = 0;
      var count = _db.log11Service.Where(x => x.network.Contains(networkName)).Count();
 
         lblNetworkName.Text = networkName;

@@ -50,9 +50,9 @@
             tabindex="11" />
 
             <asp:Label Style="color: Black;display: inline-block;font-size: small;font-style: italic;font-weight: bold;left: 270px;position: absolute;top: 465px;width: 603px;
-    z-index: 113;" runat="server" ID="lblIsPublic"  Text="Add Text Here"></asp:Label>
+    z-index: 113;" runat="server" ID="lblIsPublic"  Text="Check to make this network public."></asp:Label>
 
-            <asp:Label Style="position: absolute; font-weight: bold; top: 550px;" runat="server" ID="lblInUse" ForeColor="Red" Text="The network name you supplied is already in use. Please supply a different value." Visible="false"></asp:Label>
+            <asp:Label Style="position: absolute; font-weight: bold; top: 575px;" runat="server" ID="lblInUse" ForeColor="Red" Text="The network name you supplied is already in use. Please supply a different value." Visible="false"></asp:Label>
             <asp:LinkButton ID="SubmitButton" CssClass="btnSubmit" runat="server" CausesValidation="true" CommandName="Update"
                 Height="21px" OnClick="SubmitButton_Click" Style="border-right: black thin solid; border-top: black thin solid; font-weight: bold; z-index: 106; left: 529px; vertical-align: middle; border-left: black thin solid; color: blue; border-bottom: black thin solid; position: absolute; top: 541px; background-color: white; text-align: center; text-decoration: none"
                 Text="Next >>" Width="69px" TabIndex="11"></asp:LinkButton>
@@ -60,7 +60,7 @@
 
         <input id="chkAccept" type="checkbox" style="z-index: 112; left: 253px; position: absolute; top: 506px"
             onclick="termsAndConditions();" tabindex="11" />
-            <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl="http://his.cuahsi.org/documents/Data Policies Draftv2.pdf"
+            <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl="~/agreement/CUAHSI user agreement 2014 final.pdf"
                 Style="z-index: 107; left: 280px; position: absolute; top: 511px" Font-Bold="True" Target="_blank" TabIndex="-1">I have read and agree to the Data Service Agreement</asp:HyperLink>
             &nbsp;
 

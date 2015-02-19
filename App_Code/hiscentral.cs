@@ -35,8 +35,25 @@ public class hiscentral : System.Web.Services.WebService {
     private static readonly ILog queryLog = LogManager.GetLogger("QueryLog");
     private const string queryLogFormat = "{0}|{1}|{2}|{3}";
 
+private ServiceStatistics _ss = null;
     public ServiceStatistics ServiceStats {
-        get { return (ServiceStatistics)Application["ServiceStatistics"]; }
+        get {
+            if (_ss != null) return _ss;
+            //Try pulling from application cache if null
+            var ss = Application["ServiceStatistics"];
+            if (ss == null)
+            {
+                _ss = new ServiceStatistics();
+                Application.Add("ServiceStatistics", _ss);
+            }
+            else
+            {
+                _ss = (ServiceStatistics)ss;
+                
+
+            }
+            return _ss;
+        }
     }
 
     public hiscentral() {

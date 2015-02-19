@@ -38,7 +38,7 @@ public partial class public_network : System.Web.UI.Page
 
       Session["NetworkID"] = networkid;
       string NETWORK = " ";
-      string sql = "SELECT username, ServiceWSDL, ServiceAbs, NetworkName, ContactName, ContactEmail, ContactPhone, Organization, website, IsPublic, SupportsAllMethods, Citation, MapIconPath, OrgIconPath, LastHarvested,FrequentUpdates, Xmin, Xmax, Ymin, Ymax, ValueCount, VariableCount, SiteCount, EarliestRec, LatestRec, ServiceStatus, ProjectStatus, NetworkTitle, NetworkID, CreatedDate FROM HISNetworks WHERE (NetworkID = "+networkid+")";
+      string sql = "SELECT username, ServiceWSDL, ServiceAbs, NetworkName, ContactName, ContactEmail, ContactPhone, Organization, website, IsPublic, SupportsAllMethods, Citation, MapIconPath, OrgIconPath, DATEADD(hour, 5, LastHarvested) as LastHarvested,FrequentUpdates, Xmin, Xmax, Ymin, Ymax, ValueCount, VariableCount, SiteCount, EarliestRec, LatestRec, ServiceStatus, ProjectStatus, NetworkTitle, NetworkID, CreatedDate FROM HISNetworks WHERE (NetworkID = " + networkid + ")";
 
 
       DataSet ds = new DataSet();
@@ -88,7 +88,7 @@ public partial class public_network : System.Web.UI.Page
 
         string lastHarvested = row["LastHarvested"].ToString();
         if (lastHarvested != null && lastHarvested != "") {
-            this.lblLastHarvested.Text = "<b>Last Harvested on </b>" + lastHarvested;
+            this.lblLastHarvested.Text = "<b>Last Harvested on </b>" + lastHarvested + "(UTC)";
         }
         //if (updated == "True")
         //{
@@ -166,7 +166,7 @@ public partial class public_network : System.Web.UI.Page
             this.lblImgText.Text = "Download last tested on " + Convert.ToDateTime(row["LastTestDate"]).ToString("MM/dd/yyyy");
         } else {
             this.imgSuccess.ImageUrl = "~/images/nodata.png";
-            this.lblImgText.Text = "Record Not Available";
+            this.lblImgText.Text = "Daily health monitor not yet harvested for this network";
         
         }
     }

@@ -53,7 +53,7 @@
                 </div>
             </div>
         </div>--%>
-        <div style="float: left; margin-left:5px; margin-top: 110px;">
+        <div style="float: left; margin-left:5px; margin-top: 110px; width:100%;">
             <fieldset>
                 <legend>
                     <asp:Label runat="server" Font-Bold="true" Font-Size="22px" ID="lblNetworkName"></asp:Label></legend>                

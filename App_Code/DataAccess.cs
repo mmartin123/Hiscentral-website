@@ -135,6 +135,7 @@ public static class DataAccess_Logging {
     }
     private static hiscentral_loggingEntities _db = new hiscentral_loggingEntities();
     //ADD ANY IP ADDRESSES TO EXCLUDE IN HERE
+    public static DateTime PastDate = DateTime.Now.AddDays(-90);
     public static List<string> ExclusionList = new List<string> { "[SERVER_IP]", "::1", "137.135.87.5", "132.249.69.104", "50.199.245.201", "50.163.64.130" };
 
     #region FILTER BY DOMAIN NAME
@@ -146,22 +147,40 @@ public static class DataAccess_Logging {
         //from log11service
         //where method = 'GetValues_Start' and network = 'LittleBearRiver' and userhost not in ('xxx')
         //group by YEAR(querytime), MONTH(querytime)
-
+        List<log11Service> lst = new List<log11Service>();
         if (String.IsNullOrEmpty(networkName)) {
-            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
+            
+            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
             //if (records.Count() == 0) { records.ToList(); }
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
+           
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
+            //return result;
+            foreach (var list in records) {
+                list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+                list.userhost = ConvertIpAddressToDomainName(list.userhost);
+                lst.Add(list);
+            }
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
             return result;
         } else {
-            var records = _db.log11Service.Where(x => x.network == networkName && x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
+            var records = _db.log11Service.Where(x => x.network == networkName && x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
             //if (records.Count() == 0) { records.ToList(); }
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
+            //return result;
+            foreach (var list in records) {
+                list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+                list.userhost = ConvertIpAddressToDomainName(list.userhost);
+                lst.Add(list);
+            }
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
             return result;
         }
 
@@ -173,130 +192,213 @@ public static class DataAccess_Logging {
         //from log11service
         //where method like '%_Start' and network = 'LittleBearRiver' 
         //group by YEAR(querytime), MONTH(querytime)
+        List<log11Service> lst = new List<log11Service>();
         if (String.IsNullOrEmpty(networkName)) {
-            var records = _db.log11Service.Where(x => !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
+            var records = _db.log11Service.Where(x => !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+             foreach (var list in records) {            
+            list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+            list.userhost = ConvertIpAddressToDomainName(list.userhost);
+            lst.Add(list);
+            }
+
+            
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
+            //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
             return result;
         } else {
-            var records = _db.log11Service.Where(x => x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
+            var records = _db.log11Service.Where(x => x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            foreach (var list in records) {            
+            list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+            list.userhost = ConvertIpAddressToDomainName(list.userhost);
+            lst.Add(list);
+            }
+
+            
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
             return result;
         }
 
     }
 
     public static List<string> GetStat3(string networkName, string domainFilter) {
-
+        List<log11Service> lst = new List<log11Service>();
         //--Values per Month: The total number of values retrieved from the Water One Flow webservices associated with this network. 
         //--This chart's y axis uses a log scale. 
         if (String.IsNullOrEmpty(networkName)) {
-            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
-
+            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+            foreach (var list in records) {
+                list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+                list.userhost = ConvertIpAddressToDomainName(list.userhost);
+                lst.Add(list);
+            }
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
             return result;
         } else {
-            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
 
+            //return result;
+            foreach (var list in records) {
+                list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+                list.userhost = ConvertIpAddressToDomainName(list.userhost);
+                lst.Add(list);
+            }
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
             return result;
         }
     }
 
     public static List<string> GetStat4(string networkName, string domainFilter) {
-
+        List<log11Service> lst = new List<log11Service>();
         //--Values per Month: The total number of values retrieved from the Water One Flow webservices associated with this network. 
         //--This chart's y axis without a log scale. 
         if (String.IsNullOrEmpty(networkName)) {
-            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+            //return result;
+            foreach (var list in records) {
+                list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+                list.userhost = ConvertIpAddressToDomainName(list.userhost);
+                lst.Add(list);
+            }
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
             return result;
         } else {
-            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-            records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
-            records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-            records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-            var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+            var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+            //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
+            //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+            //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+            //return result;
+            foreach (var list in records) {
+                list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, 1, 0, 0, 0);
+                list.userhost = ConvertIpAddressToDomainName(list.userhost);
+                lst.Add(list);
+            }
+            lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+            var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
             return result;
         }
     }
 
     public static List<string> GetStat1_GroupByDay(string networkName, string domainFilter) {
-        var records = _db.log11Service.Where(x => x.network == networkName && x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-        records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
-        records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-        records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-        var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
+        List<log11Service> lst = new List<log11Service>();
+        var records = _db.log11Service.Where(x => x.network == networkName && x.method.Contains("GetValues") && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+        //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
+        //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+        //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
+        foreach (var list in records)
+        {
+            list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, list.querytime.Day, 0, 0, 0);
+            list.userhost = ConvertIpAddressToDomainName(list.userhost);
+            lst.Add(list);
+        }
+        lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => ConvertIpAddressToDomainName(y.userhost)).Distinct().Count())).ToList();
         return result;
     }
 
     public static List<string> GetStat2_GroupByDay(string networkName, string domainFilter) {
-        var records = _db.log11Service.Where(x => x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-        records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
-        records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-        records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-        var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
+        List<log11Service> lst = new List<log11Service>();
+        var records = _db.log11Service.Where(x => x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+        //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
+        //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+        //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
+        foreach (var list in records)
+        {
+            list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, list.querytime.Day, 0, 0, 0);
+            list.userhost = ConvertIpAddressToDomainName(list.userhost);
+            lst.Add(list);
+        }
+        lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
         return result;
     }
 
     public static List<string> GetStat3_GroupByDay(string networkName, string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-        records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
-        records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-        records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-        var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+        List<log11Service> lst = new List<log11Service>();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+        //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
+        //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+        //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+        foreach (var list in records)
+        {
+            list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, list.querytime.Day, 0, 0, 0);
+            list.userhost = ConvertIpAddressToDomainName(list.userhost);
+            lst.Add(list);
+        }
+        lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
 
         return result;
     }
 
     public static List<string> GetStat4_GroupByDay(string networkName, string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.")).OrderBy(x => x.querytime).ToList();
-        records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
-        records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
-        records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
-        var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+        List<log11Service> lst = new List<log11Service>();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.network == networkName && !ExclusionList.Contains(x.userhost) && !x.userhost.Contains("10.") && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
+        //records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
+        //records.ForEach(x => x.userhost = ConvertIpAddressToDomainName(x.userhost));
+        //records = records.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        //var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
+        foreach (var list in records)
+        {
+            list.querytime = new DateTime(list.querytime.Year, list.querytime.Month, list.querytime.Day, 0, 0, 0);
+            list.userhost = ConvertIpAddressToDomainName(list.userhost);
+            lst.Add(list);
+        }
+        lst = lst.Where(x => x.userhost.EndsWith(domainFilter)).ToList();
+        var result = lst.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
 
         return result;
     }
 
 
     public static List<string> GetStat1(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]").OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]" && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
         var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => y.userhost).Distinct().Count())).ToList();
         return result;
     }
 
     public static List<string> GetStat2(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.userhost.Contains(domainFilter)).OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.userhost.Contains(domainFilter) && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
         var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
         return result;
     }
 
     public static List<string> GetStat3(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]").OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]" && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
         var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round(Math.Log10(Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
         return result;
     }
 
     public static List<string> GetStat4(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]").OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]" && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, 1, 0, 0, 0));
         var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, Math.Round((Convert.ToDouble(x.Select(y => y.reccount).Sum())), 2))).ToList();
         return result;
@@ -304,23 +406,23 @@ public static class DataAccess_Logging {
 
 
     public static List<string> GetStat1_GroupByDay(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]").OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]" && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
 
         var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Select(y => y.userhost).Distinct().Count())).ToList();
 
         return result;
     }
-
+     
     public static List<string> GetStat2_GroupByDay(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.userhost.Contains(domainFilter)).OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.userhost.Contains(domainFilter) && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
         var result = records.GroupBy(x => x.querytime).Select(x => String.Format("{0},{1}", x.Key, x.Count())).ToList();
         return result;
     }
 
     public static List<string> GetStat3_GroupByDay(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]").OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]" && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
         //do the padding
 
@@ -332,7 +434,7 @@ public static class DataAccess_Logging {
     }
 
     public static List<string> GetStat4_GroupByDay(string domainFilter) {
-        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]").OrderBy(x => x.querytime).ToList();
+        var records = _db.log11Service.Where(x => x.method.Contains("GetValues") && x.userhost.Contains(domainFilter) && x.userhost != "[SERVER_IP]" && x.querytime >= PastDate).OrderBy(x => x.querytime).ToList();
         records.ForEach(x => x.querytime = new DateTime(x.querytime.Year, x.querytime.Month, x.querytime.Day, 0, 0, 0));
         //do the padding
 

@@ -28,9 +28,6 @@ public partial class addnetwork : System.Web.UI.Page {
         Response.Redirect("mynetworks.aspx");
     }
 
-
-    //INSERT INTO HISNetworks(username, NetworkName, ServiceAbs, ServiceWSDL, ContactEmail, ContactName, ContactPhone, Organization, website) 
-    //VALUES (,,,,,,,,)">
     protected void SubmitButton_Click(object sender, EventArgs e) {
          var validationResult = CheckIfNetworkAndWSDLNameInUse(txtNetworkName.Text, txtServiceWSDL.Text);
         if (String.IsNullOrEmpty(validationResult)) {
@@ -81,113 +78,73 @@ public partial class addnetwork : System.Web.UI.Page {
         return validationResult;
     }
 
-    private void getNetworkID() {
-        String sql = "Select max(networkID) as newnetwork from HISNetworks where username = '" + Page.User.Identity.Name + "'";
+    private void getNetworkID()
+    {
+        String sql = " select top(1) networkId,networkName from hisnetworks where username = '" + Page.User.Identity.Name + "' order by networkid desc";
         DataSet ds = new DataSet();
         SqlConnection con = new SqlConnection(SqlDataSource1.ConnectionString);
         int netid = 0;
-        using (con) {
+        string netname = String.Empty;
+        using (con)
+        {
             SqlDataAdapter da = new SqlDataAdapter(sql, con);
             da.Fill(ds, "network");
         }
         con.Close();
         //should be only one
-        foreach (DataRow dataRow in ds.Tables["network"].Rows) {
-            netid = (int)dataRow[0];
+        foreach (DataRow dataRow in ds.Tables["network"].Rows)
+        {
+            netid = (int)dataRow["networkId"];
+            netname = dataRow["networkName"].ToString();
         }
-        if (netid != 0) {
-            //mailAdmins(netid);            
+        if (netid != 0)
+        {
+            //mailAdmins(netid);           
             Session["NetworkID"] = netid;
 
-            Runharvester();
+            InsertNewNetworktable(netid);
+            sendEmail(netname);
 
             Response.Redirect("network.aspx");
-        } else {
+        }
+        else
+        {
             Response.Redirect("mynetworks.aspx");
         }
 
 
 
     }
-    private void Runharvester() {
 
-        try {
-            HarvesterRun.HarvesterRun objHarvesterRun = new HarvesterRun.HarvesterRun();
-            var path = objHarvesterRun.HarvestRun();
-            var pathCount = VirtualPathUtility.ToAbsolute("~/").Length;
-            path = path.Remove(0, pathCount);
-            var fileContents = System.IO.File.ReadAllText(Server.MapPath(@"~/" + path + ""));
-            if (fileContents.Contains("ERROR: Harvest halted as no sites were obtained from this WSDL. Please check")) {
-                SendErrorEmail();
-            } else {
-                SqlConnection sqlConn = new SqlConnection(SqlDataSource1.ConnectionString);
-                SqlCommand sqlComm = new SqlCommand();
-                sqlComm = sqlConn.CreateCommand();
-                sqlComm.CommandText = @"UPDATE HisNetworks SET IsPublic=1 WHERE NetworkId =" + Convert.ToInt32(Session["NetworkID"]);
-                sqlConn.Open();
-                sqlComm.ExecuteNonQuery();
-                sqlConn.Close();
-                SendSuccesEmail();
-            }
-            //SVNCurrentHiscentealCode/admin/harvester/logs/3525_20140822.htm
-        } catch (Exception ex) {
-
-        }
-
+    private void InsertNewNetworktable(int networkId)
+    {
+        SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["CentralHISConnectionString"].ToString());
+        SqlCommand cmd = new SqlCommand();
+        cmd.CommandText = "INSERT INTO NewNetworkHarvestJob (NetworkId) VALUES (@NetworkId)";
+        //Uses the FirstName variable and creates a new sql variable for use in the sql commandtext
+        cmd.Parameters.Add("@NetworkId", SqlDbType.Int).Value = networkId;
+        cmd.Connection = conn;
+        conn.Open();
+        cmd.ExecuteNonQuery();
+        conn.Close();
     }
+
     /// <summary>
     /// Method to send Email
     /// </summary>
-    private void SendErrorEmail() {
+    private void sendEmail(string networkname)
+    {
         MailMessage m = new MailMessage();
         SmtpClient sc = new SmtpClient();
         m.From = new MailAddress("hydroseek@gmail.com", "Cuahsi HIS Central Administration");
         m.To.Add(new MailAddress(Page.User.Identity.Name));
-        //m.CC.Add(new MailAddress("help@cuahsi.org", "Jon Pollak"));
-        m.CC.Add(new MailAddress("mmartin@cuahsi.org", "Marie Martin"));
-        //m.To.Add(new MailAddress("rhooper@cuahsi.org", "Rick Hooper"));
-        //m.To.Add(new MailAddress("jpollak@cuahsi.org", "Jon Pollak"));
-        //m.To.Add(new MailAddress("mseul@cuahsi.org", "Martin Seul"));
-        //m.To.Add(new MailAddress("klavigne@cuahsi.org", "Kristin Lavigne"));
-        //m.CC.Add(new MailAddress("acouch@cuahsi.org", "Alva Couch"));
-        m.Subject = "Error in webservice WSDL";
+        m.CC.Add(new MailAddress("Help@cuahsi.org"));
+        m.Bcc.Add(new MailAddress("mmartin@cuahsi.org", "Marie Martin"));
+        m.Subject = "Data Service is added";
         StringBuilder Sb = new StringBuilder();
         Sb.Append("<h3>Hello,</h3><br />");
-        Sb.Append("<p>Harvest halted as no sites were obtained from this WSDL. Please check</p>");
-        Sb.Append("Thank you");
-        m.Body = Convert.ToString(Sb);
-        m.IsBodyHtml = true;
-        sc.Host = "smtp.gmail.com";
-        sc.Port = 587;
-        sc.Credentials = new System.Net.NetworkCredential("hydroseek@gmail.com", "his4cuahsi");
-        sc.EnableSsl = true;
-        sc.Send(m);
-    }
-
-
-    /// <summary>
-    /// Method to send Email
-    /// </summary>
-    private void SendSuccesEmail() {
-        MailMessage m = new MailMessage();
-        SmtpClient sc = new SmtpClient();
-        m.From = new MailAddress("hydroseek@gmail.com", "Cuahsi HIS Central Administration");
-       // m.To.Add(new MailAddress("jpollak@cuahsi.org", "Jon Pollak"));
-        m.CC.Add(new MailAddress("mmartin@cuahsi.org", "Marie Martin"));
-        //m.CC.Add(new MailAddress("mmartin@cuahsi.org", "Marie Martin"));
-        //m.To.Add(new MailAddress("rhooper@cuahsi.org", "Rick Hooper"));       
-        //m.To.Add(new MailAddress("mseul@cuahsi.org", "Martin Seul"));
-        //m.To.Add(new MailAddress("klavigne@cuahsi.org", "Kristin Lavigne"));
-        //m.CC.Add(new MailAddress("acouch@cuahsi.org", "Alva Couch"));
-        //Session["NetworkID
-        //http://hiscentral2.cuahsi.org/pub_network.aspx?n=4
-        
-        m.Subject = "New Service is added";
-        StringBuilder Sb = new StringBuilder();
-        Sb.Append("<h3>Hello,</h3><br />");
-        Sb.Append("<p>A new data service is registered with HIS Central. </p>");
-        Sb.Append("<p>Below is the sevice page URL : </p>");
-        Sb.Append("<p><a href='" + (HttpContext.Current.Request.Url.AbsoluteUri).Replace("addnetwork.aspx", "pub_network.aspx") + "?n=" + Session["NetworkID"].ToString() + "'>" + (HttpContext.Current.Request.Url.AbsoluteUri).Replace("addnetwork.aspx", "pub_network.aspx") + "?n=" + Session["NetworkID"].ToString() + "</a></p>");
+        Sb.Append("<p>New data service (" + networkname + ") is registered with HIS Central. </p>");
+        Sb.Append("<p>you will be notify once the harvester is started for this data service.</p>");
         Sb.Append("<p>Thank you</p>");
         m.Body = Convert.ToString(Sb);
         m.IsBodyHtml = true;

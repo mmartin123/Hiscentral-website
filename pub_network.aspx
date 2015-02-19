@@ -152,7 +152,7 @@
           <asp:Label ID="lblChangesValueCounts" runat="server" Font-Size="Small" Height="20px" Style="z-index: 107;
                      left: 20px; position: absolute; top: 450px" Width="400px"></asp:Label>
         <asp:Image runat="server" ID="imgSuccess" Style="z-index: 109; left: 530px; position: absolute; top: 500px" Width="25px" height="25px"/>
-        <asp:Label runat="server" ID="lblImgText" Font-Size="Small" Height="20px" Style="z-index: 109; left: 363px; position: absolute; top: 525px"></asp:Label>
+        <asp:Label runat="server" ID="lblImgText" Font-Size="Small" Height="20px" Style="z-index: 109; left: 268px; position: absolute; top: 525px"></asp:Label>
                    <asp:Label ID="lblLastHarvested" runat="server" Font-Size="Small" Height="20px" Style="z-index: 107;
                      left: 20px; position: absolute; top: 420px" Width="500px"></asp:Label>                     
                 <asp:Label ID="lblOrganizationLabel" runat="server"  style="z-index: 108; left: 124px; position: absolute; top: 177px" Height="20px" Width="670px" Font-Bold="True" Font-Size="Large"></asp:Label>                            

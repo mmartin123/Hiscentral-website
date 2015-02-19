@@ -31,8 +31,7 @@ namespace HisCentral {
             // Code that runs on application startup
             String codeDate = File.GetCreationTimeUtc(Assembly.GetExecutingAssembly().Location).ToString();
 
-            //Database.SetInitializer<ApplicationDbContext>(null);
-
+            
             //String process = "GenericODWS_Start";
             //String path = Context.Request.ApplicationPath;
 
@@ -64,20 +63,20 @@ namespace HisCentral {
             //  Code that runs on application shutdown
             String process = "GenericODWS_Stop";
 
-            perfLog.Info(process);
-            perfLog.Info(((ServiceStatistics)Application["ServiceStatistics"]).ToString());
+            //perfLog.Info(process);
+            //perfLog.Info(((ServiceStatistics)Application["ServiceStatistics"]).ToString());
         }
 
         void Application_Error(object sender, EventArgs e) {
 
             // Code that runs when an unhandled error occurs
-            perfLog.Error("Application Error");
+            //perfLog.Error("Application Error");
             //perfLog.Info(((ServiceStatistics)Application["ServiceStatistics"]).ToString());
         }
 
         void Session_Start(object sender, EventArgs e) {
 
-            perfLog.Debug("sessionStart");
+            //perfLog.Debug("sessionStart");
 
            // perfLog.Info(((ServiceStatistics)Application["ServiceStatistics"]).ToString());
         }
@@ -88,8 +87,8 @@ namespace HisCentral {
             // is set to InProc in the Web.config file. If session mode is set to StateServer 
             // or SQLServer, the event is not raised.
             try {
-                perfLog.Debug("sessionEnd");
-                perfLog.Info(((ServiceStatistics)Application["ServiceStatistics"]).ToString());
+                //perfLog.Debug("sessionEnd");
+                //perfLog.Info(((ServiceStatistics)Application["ServiceStatistics"]).ToString());
             } catch (Exception ex) {
                 //Do Nothing
             }

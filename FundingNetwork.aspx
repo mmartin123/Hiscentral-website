@@ -103,7 +103,7 @@
                             <th>Organization</th>
                             <th>Agency Name</th>
                             <th>Award ID</th>
-                            <th></th>
+                            <th>Action</th>
                         </tr>
 
                     </thead>

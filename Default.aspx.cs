@@ -16,7 +16,7 @@ public partial class _Default : System.Web.UI.Page
    public string count = "";
   protected void Page_Load(object sender, EventArgs e)
   {
-    string sql = "SELECT count(*) as count from HISNETWORKS where IsPublic = 1";
+      string sql = "SELECT count(*) as count from HISNETWORKS where IsPublic = 1 and EarliestRec is not null and LatestRec is not  null";
 
     DataSet ds = new DataSet();
     SqlConnection con = new SqlConnection(this.SqlDataSource1.ConnectionString);

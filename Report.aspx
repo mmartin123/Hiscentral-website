@@ -57,7 +57,7 @@ table th {
                 <br />
                 <asp:HyperLink ID="lnkReportDailyStatistics" runat="server" Text="Click here for daily aggregates"></asp:HyperLink>
             </div>
-             <p> We need to update your HydroServer software in order for us to log your metrics! Please contact <a href="mailto:jpollak@cuahsi.org">Jon Pollak</a> at your earliest convenience for assistance.</p>
+<%--<p> We need to update your HydroServer software in order for us to log your metrics! Please contact <a href="mailto:jpollak@cuahsi.org">Jon Pollak</a> at your earliest convenience for assistance.</p>--%>
             <div style="color: #FF0000; margin-left: 500px; margin-top: 47px;">
                 <asp:Label runat="server" ID="lblErrorMsg"></asp:Label>
             </div>
